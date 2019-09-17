@@ -43,8 +43,18 @@ class RemoveMenuItemViewModel: TodoMenuItemViewModel {
 }
 
 class DoneMenuItemViewModel: TodoMenuItemViewModel {
+    var isDone: Bool = false {
+        didSet {
+            if isDone {
+                title = "Undone"
+            } else {
+                title = "Done"
+            }
+        }
+    }
     override func onMenuItemSelected() {
         parent?.onDoneSelected()
+        isDone = !isDone
     }
 }
 
@@ -58,6 +68,7 @@ protocol TodoItemPresentable {
     
     var id: String? { get }
     var textValue: String? { get }
+    var isDone: Bool? { get set }
     var menuItems: [TodoMenuItemViewPresentable]? { get }
 }
 
@@ -65,12 +76,14 @@ class TodoItemViewModel: TodoItemPresentable {
     
     var id: String? = "0"
     var textValue: String? = nil
+    var isDone: Bool? = false
     var menuItems: [TodoMenuItemViewPresentable]? = []
     weak var parent: TodoViewDelegate?
     
     init(id: String, textValue: String, parentViewModel: TodoViewDelegate) {
         self.id = id
         self.textValue = textValue
+        self.isDone = false
         self.parent = parentViewModel
         
         let remove = RemoveMenuItemViewModel(parentViewModel: self)
@@ -79,6 +92,7 @@ class TodoItemViewModel: TodoItemPresentable {
         
         let done = DoneMenuItemViewModel(parentViewModel: self)
         done.title = "Done"
+        done.isDone = false
         done.backgroundColor = "008000"
         
         menuItems?.append(contentsOf: [remove, done])
@@ -95,7 +109,7 @@ extension TodoItemViewModel: TodoItemDelegate {
     }
     
     func onDoneSelected() {
-        parent?.onDoneItem(todiId: id!)
+        parent?.onDoneItem(todoId: id!)
     }
 }
 
@@ -103,7 +117,7 @@ protocol TodoViewDelegate: class {
     
     func onAddTodoItem()
     func onDeleteItem(todoId: String)
-    func onDoneItem(todiId: String)
+    func onDoneItem(todoId: String)
 }
 
 protocol TodoViewPresentable {
@@ -148,8 +162,24 @@ extension TodoViewModel: TodoViewDelegate {
         view?.removeTodoItem(at: index)
     }
     
-    func onDoneItem(todiId: String) {
+    func onDoneItem(todoId: String) {
+        guard let index = items.firstIndex(where: { $0.id == todoId }) else {
+            return
+        }
         
+        var item = self.items[index]
+        item.isDone = !(item.isDone)!
+        self.items.sort(by: {
+            if ($0.isDone)! ^^ ($1.isDone)! {
+                return !($0.isDone)! && $1.isDone!
+            } else {
+                return $0.id! < $1.id!
+            }
+            
+        })
+        self.view?.reloadTodoItems()
     }
     
 }
+
+

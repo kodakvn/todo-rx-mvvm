@@ -16,6 +16,15 @@ class TodoItemTableViewCell: UITableViewCell {
     func configure(viewModel: TodoItemPresentable) {
         
         txtIndex.text = viewModel.id
-        txtTodoItem.text = viewModel.textValue
+        let attributedString = NSMutableAttributedString(string: viewModel.textValue!)
+        
+        if viewModel.isDone! {
+            let range = NSMakeRange(0, attributedString.length)
+            attributedString.addAttribute(NSAttributedString.Key.strikethroughColor, value: UIColor.lightGray, range: range)
+            attributedString.addAttribute(NSAttributedString.Key.strikethroughStyle, value: 1, range: range)
+            attributedString.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.lightGray, range: range)
+        }
+        
+        txtTodoItem.attributedText = attributedString
     }
 }
