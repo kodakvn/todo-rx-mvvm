@@ -16,6 +16,8 @@
 		675E80D5232D481C00740791 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 675E80D3232D481C00740791 /* Main.storyboard */; };
 		675E80D7232D481D00740791 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 675E80D6232D481D00740791 /* Assets.xcassets */; };
 		675E80DA232D481D00740791 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 675E80D8232D481D00740791 /* LaunchScreen.storyboard */; };
+		676747F52332895A0021B1CE /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676747F42332895A0021B1CE /* Database.swift */; };
+		676747F72332899B0021B1CE /* TodoItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676747F62332899B0021B1CE /* TodoItem.swift */; };
 		826BB9CB3F9C0F39A630B101 /* Pods_TodoMVVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70C4DBBA271E761F6031D9FF /* Pods_TodoMVVM.framework */; };
 /* End PBXBuildFile section */
 
@@ -32,6 +34,8 @@
 		675E80D6232D481D00740791 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		675E80D9232D481D00740791 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		675E80DB232D481D00740791 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		676747F42332895A0021B1CE /* Database.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
+		676747F62332899B0021B1CE /* TodoItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItem.swift; sourceTree = "<group>"; };
 		6BBD36B890E48A7C39B0ACCA /* Pods-TodoMVVM.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TodoMVVM.release.xcconfig"; path = "Target Support Files/Pods-TodoMVVM/Pods-TodoMVVM.release.xcconfig"; sourceTree = "<group>"; };
 		70C4DBBA271E761F6031D9FF /* Pods_TodoMVVM.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TodoMVVM.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -79,6 +83,8 @@
 				670751D8232D4BE900EC257F /* TodoItemTableViewCell.swift */,
 				670751DA232D4DF300EC257F /* TodoItemTableViewCell.xib */,
 				6721983723312B3600D33A33 /* BoolExtensions.XOR.swift */,
+				676747F42332895A0021B1CE /* Database.swift */,
+				676747F62332899B0021B1CE /* TodoItem.swift */,
 			);
 			path = TodoMVVM;
 			sourceTree = "<group>";
@@ -89,7 +95,6 @@
 				22933ADC008D82AB4CE0CB7D /* Pods-TodoMVVM.debug.xcconfig */,
 				6BBD36B890E48A7C39B0ACCA /* Pods-TodoMVVM.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -228,6 +233,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				676747F72332899B0021B1CE /* TodoItem.swift in Sources */,
+				676747F52332895A0021B1CE /* Database.swift in Sources */,
 				670751D7232D499700EC257F /* TodoViewModel.swift in Sources */,
 				6721983823312B3600D33A33 /* BoolExtensions.XOR.swift in Sources */,
 				675E80D2232D481C00740791 /* ViewController.swift in Sources */,

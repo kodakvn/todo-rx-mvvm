@@ -8,6 +8,7 @@
 
 import Foundation
 import RxSwift
+import RealmSwift
 
 protocol TodoMenuItemViewPresentable {
     
@@ -77,14 +78,20 @@ class TodoItemViewModel: TodoItemPresentable {
     
     var id: String? = "0"
     var textValue: String? = nil
-    var isDone: Bool? = false
+    var isDone: Bool? = false {
+        didSet {
+            if let menu = menuItems?.first(where: { $0 is DoneMenuItemViewModel} ) as? DoneMenuItemViewModel {
+                menu.isDone = isDone ?? false
+            }
+        }
+    }
     var menuItems: [TodoMenuItemViewPresentable]? = []
     weak var parent: TodoViewDelegate?
     
-    init(id: String, textValue: String, parentViewModel: TodoViewDelegate) {
+    init(id: String, textValue: String, parentViewModel: TodoViewDelegate, isDone: Bool = false) {
         self.id = id
         self.textValue = textValue
-        self.isDone = false
+        self.isDone = isDone
         self.parent = parentViewModel
         
         let remove = RemoveMenuItemViewModel(parentViewModel: self)
@@ -92,8 +99,7 @@ class TodoItemViewModel: TodoItemPresentable {
         remove.backgroundColor = "ff0000"
         
         let done = DoneMenuItemViewModel(parentViewModel: self)
-        done.title = "Done"
-        done.isDone = false
+        done.isDone = isDone
         done.backgroundColor = "008000"
         
         menuItems?.append(contentsOf: [remove, done])
@@ -131,12 +137,68 @@ class TodoViewModel: TodoViewPresentable {
     
     var newTodoItem: String?
     var items: Variable<[TodoItemPresentable]> = Variable([])
+    var database: Database
+    var notificationToken: NotificationToken? = nil
     
     init() {
-        let item1 = TodoItemViewModel(id: "1", textValue: "Washing clothes", parentViewModel: self)
-        let item2 = TodoItemViewModel(id: "2", textValue: "Buy Groceries", parentViewModel: self)
-        let item3 = TodoItemViewModel(id: "3", textValue: "Wash car", parentViewModel: self)
-        items.value.append(contentsOf: [item1, item2, item3])
+        database = Database.singleton
+        
+        let results = database.fetch()
+        notificationToken = results.observe({ [weak self] (changes: RealmCollectionChange) in
+            guard let _self_ = self else { return }
+            
+            switch changes {
+            case .initial:
+                results.forEach({ item in
+                    let newItem = TodoItemViewModel(id: "\(item.todoId)", textValue: item.todoValue, parentViewModel: _self_, isDone: item.isDone)
+                    _self_.items.value.append(newItem)
+                })
+            case .update(_, let deletions, let insertions, let modifications):
+                insertions.forEach({ index in
+                    let item = results[index]
+                    let newItem = TodoItemViewModel(id: "\(item.todoId)", textValue: item.todoValue, parentViewModel: _self_)
+                    _self_.items.value.append(newItem)
+                })
+                
+                deletions.forEach({ index in
+                    
+                })
+                
+                modifications.forEach({ index in
+                    let item = results[index]
+                    
+                    guard let aIndex = _self_.items.value.firstIndex(where: { Int($0.id!) == item.todoId }) else {
+                        return
+                    }
+                    
+                    if item.deletedAt != nil {
+                        _self_.items.value.remove(at: index)
+                        _self_.database.delete(primaryKey: item.todoId)
+                        return
+                    }
+                    
+                    var todoItem = _self_.items.value[aIndex]
+                    todoItem.isDone = item.isDone
+                })
+            case .error(let error): break
+            }
+            
+            _self_.sort()
+        })
+    }
+    
+    deinit {
+        notificationToken?.invalidate()
+    }
+    
+    private func sort() {
+        items.value.sort(by: {
+            if ($0.isDone)! ^^ ($1.isDone)! {
+                return !($0.isDone)! && $1.isDone!
+            } else {
+                return $0.id! < $1.id!
+            }
+        })
     }
 }
 
@@ -145,35 +207,16 @@ extension TodoViewModel: TodoViewDelegate {
         guard let value = newTodoItem else {
             return
         }
-        let index = items.value.count + 1
-        let newItem = TodoItemViewModel(id: "\(index)", textValue: value, parentViewModel: self)
-        items.value.append(newItem)
+        database.createOrUpdate(todoItemValue: value)
         newTodoItem = nil
     }
     
     func onDeleteItem(todoId: String) {
-        guard let index = items.value.firstIndex(where: { $0.id == todoId }) else {
-            return
-        }
-        
-        items.value.remove(at: index)
+        database.softDelete(primaryKey: Int(todoId)!)
     }
     
     func onDoneItem(todoId: String) {
-        guard let index = items.value.firstIndex(where: { $0.id == todoId }) else {
-            return
-        }
-        
-        var item = self.items.value[index]
-        item.isDone = !(item.isDone)!
-        self.items.value.sort(by: {
-            if ($0.isDone)! ^^ ($1.isDone)! {
-                return !($0.isDone)! && $1.isDone!
-            } else {
-                return $0.id! < $1.id!
-            }
-            
-        })
+        database.isDone(primaryKey: Int(todoId)!)
     }
     
 }
