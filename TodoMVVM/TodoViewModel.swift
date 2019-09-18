@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import RxSwift
 
 protocol TodoMenuItemViewPresentable {
     
@@ -101,7 +102,7 @@ class TodoItemViewModel: TodoItemPresentable {
 
 extension TodoItemViewModel: TodoItemDelegate {
     func onItemSelected() {
-        print("select \(id)")
+        print("select \(String(describing: id))")
     }
     
     func onRemoveSelected() {
@@ -128,16 +129,14 @@ protocol TodoViewPresentable {
 
 class TodoViewModel: TodoViewPresentable {
     
-    weak var view: TodoView?
     var newTodoItem: String?
-    var items: [TodoItemPresentable] = []
+    var items: Variable<[TodoItemPresentable]> = Variable([])
     
-    init(view: TodoView) {
-        self.view = view
+    init() {
         let item1 = TodoItemViewModel(id: "1", textValue: "Washing clothes", parentViewModel: self)
         let item2 = TodoItemViewModel(id: "2", textValue: "Buy Groceries", parentViewModel: self)
         let item3 = TodoItemViewModel(id: "3", textValue: "Wash car", parentViewModel: self)
-        items.append(contentsOf: [item1, item2, item3])
+        items.value.append(contentsOf: [item1, item2, item3])
     }
 }
 
@@ -146,30 +145,28 @@ extension TodoViewModel: TodoViewDelegate {
         guard let value = newTodoItem else {
             return
         }
-        let index = items.count + 1
+        let index = items.value.count + 1
         let newItem = TodoItemViewModel(id: "\(index)", textValue: value, parentViewModel: self)
-        items.append(newItem)
+        items.value.append(newItem)
         newTodoItem = nil
-        view?.insertTodoItem()
     }
     
     func onDeleteItem(todoId: String) {
-        guard let index = items.firstIndex(where: { $0.id == todoId }) else {
+        guard let index = items.value.firstIndex(where: { $0.id == todoId }) else {
             return
         }
         
-        items.remove(at: index)
-        view?.removeTodoItem(at: index)
+        items.value.remove(at: index)
     }
     
     func onDoneItem(todoId: String) {
-        guard let index = items.firstIndex(where: { $0.id == todoId }) else {
+        guard let index = items.value.firstIndex(where: { $0.id == todoId }) else {
             return
         }
         
-        var item = self.items[index]
+        var item = self.items.value[index]
         item.isDone = !(item.isDone)!
-        self.items.sort(by: {
+        self.items.value.sort(by: {
             if ($0.isDone)! ^^ ($1.isDone)! {
                 return !($0.isDone)! && $1.isDone!
             } else {
@@ -177,7 +174,6 @@ extension TodoViewModel: TodoViewDelegate {
             }
             
         })
-        self.view?.reloadTodoItems()
     }
     
 }
