@@ -18,6 +18,12 @@ class Database {
         let realm = try! Realm()
         
         var index = 1
+        
+        let isEmpty = realm.objects(TodoItem.self).filter({ $0.todoValue.lowercased() == todoItemValue.lowercased() }).isEmpty
+        if !isEmpty {
+            return
+        }
+        
         if let lastItem = realm.objects(TodoItem.self).last {
             index = lastItem.todoId + 1
         }

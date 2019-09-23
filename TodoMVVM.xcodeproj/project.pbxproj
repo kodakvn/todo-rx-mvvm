@@ -18,6 +18,7 @@
 		675E80DA232D481D00740791 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 675E80D8232D481D00740791 /* LaunchScreen.storyboard */; };
 		676747F52332895A0021B1CE /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676747F42332895A0021B1CE /* Database.swift */; };
 		676747F72332899B0021B1CE /* TodoItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676747F62332899B0021B1CE /* TodoItem.swift */; };
+		679DAC5923392AC900A88933 /* ApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 679DAC5823392AC900A88933 /* ApiService.swift */; };
 		826BB9CB3F9C0F39A630B101 /* Pods_TodoMVVM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70C4DBBA271E761F6031D9FF /* Pods_TodoMVVM.framework */; };
 /* End PBXBuildFile section */
 
@@ -36,6 +37,7 @@
 		675E80DB232D481D00740791 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		676747F42332895A0021B1CE /* Database.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
 		676747F62332899B0021B1CE /* TodoItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItem.swift; sourceTree = "<group>"; };
+		679DAC5823392AC900A88933 /* ApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiService.swift; sourceTree = "<group>"; };
 		6BBD36B890E48A7C39B0ACCA /* Pods-TodoMVVM.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TodoMVVM.release.xcconfig"; path = "Target Support Files/Pods-TodoMVVM/Pods-TodoMVVM.release.xcconfig"; sourceTree = "<group>"; };
 		70C4DBBA271E761F6031D9FF /* Pods_TodoMVVM.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TodoMVVM.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -85,6 +87,7 @@
 				6721983723312B3600D33A33 /* BoolExtensions.XOR.swift */,
 				676747F42332895A0021B1CE /* Database.swift */,
 				676747F62332899B0021B1CE /* TodoItem.swift */,
+				679DAC5823392AC900A88933 /* ApiService.swift */,
 			);
 			path = TodoMVVM;
 			sourceTree = "<group>";
@@ -207,19 +210,23 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-TodoMVVM/Pods-TodoMVVM-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
 				"${BUILT_PRODUCTS_DIR}/Realm/Realm.framework",
 				"${BUILT_PRODUCTS_DIR}/RealmSwift/RealmSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/RxCocoa/RxCocoa.framework",
 				"${BUILT_PRODUCTS_DIR}/RxSwift/RxSwift.framework",
+				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RealmSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxCocoa.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -239,6 +246,7 @@
 				6721983823312B3600D33A33 /* BoolExtensions.XOR.swift in Sources */,
 				675E80D2232D481C00740791 /* ViewController.swift in Sources */,
 				670751D9232D4BE900EC257F /* TodoItemTableViewCell.swift in Sources */,
+				679DAC5923392AC900A88933 /* ApiService.swift in Sources */,
 				675E80D0232D481C00740791 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -9,6 +9,7 @@
 import Foundation
 import RxSwift
 import RealmSwift
+import SwiftyJSON
 
 protocol TodoMenuItemViewPresentable {
     
@@ -142,6 +143,21 @@ class TodoViewModel: TodoViewPresentable {
     
     init() {
         database = Database.singleton
+
+        ApiService.sharedInstance.fetchAllTodos { (data) in
+            let todoDict = try? JSON(data: data)
+            
+            if let todosArray = todoDict?["todos"].array {
+                todosArray.forEach({ todoItemDict in
+                    if let itemDict = todoItemDict.dictionary {
+                        if let id = itemDict["id"]?.int, let value = itemDict["value"]?.string {
+                            self.database.createOrUpdate(todoItemValue: value)
+                        }
+                    }
+                })
+            }
+        }
+        
         
         let results = database.fetch()
         notificationToken = results.observe({ [weak self] (changes: RealmCollectionChange) in
