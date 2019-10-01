@@ -140,29 +140,20 @@ class TodoViewModel: TodoViewPresentable {
     var newTodoItem: String?
     var searchValue: Variable<String> = Variable("")
     var items: Variable<[TodoItemPresentable]> = Variable([])
-    var filteredItems: Variable<[TodoItemPresentable]> = Variable([])
     var database: Database
     var notificationToken: NotificationToken? = nil
-    let disposeBag = DisposeBag()
-    
-    lazy var searchValueObservable: Observable<String> = self.searchValue.asObservable()
-    lazy var itemsObservable: Observable<[TodoItemPresentable]> = self.items.asObservable()
-    lazy var filteredItemsObservable: Observable<[TodoItemPresentable]> = self.filteredItems.asObservable()
+    var filteredItemsObservable: Observable<[TodoItemPresentable]>
     
     init() {
         database = Database.singleton
+        
+        filteredItemsObservable = Observable.combineLatest(items.asObservable(), searchValue.asObservable()) { items, text in
+            return items.filter({ text.isEmpty ? true : $0.textValue?.lowercased().contains(text.lowercased()) ?? false })
+        }
+        
         fetchTodos()
         handleRealmNotifications()
         
-        searchValueObservable.subscribe(onNext: { value in
-            self.itemsObservable.map({ items in
-                items.filter({ text in
-                    if value.isEmpty { return true }
-                    return text.textValue?.lowercased().contains(value.lowercased()) ?? true
-                })
-                
-            }).bind(to: self.filteredItems).disposed(by: self.disposeBag)
-        }).disposed(by: disposeBag)
     }
     
     deinit {

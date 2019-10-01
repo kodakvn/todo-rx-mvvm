@@ -62,7 +62,7 @@ class ViewController: UIViewController {
         
         viewModel = TodoViewModel()
         
-        viewModel?.filteredItems.asObservable().bind(to: tableViewItems.rx.items(cellIdentifier: "TodoItemTableViewCell", cellType: TodoItemTableViewCell.self)) { (index, item, cell) in
+        viewModel?.filteredItemsObservable.bind(to: tableViewItems.rx.items(cellIdentifier: "TodoItemTableViewCell", cellType: TodoItemTableViewCell.self)) { (index, item, cell) in
             cell.configure(viewModel: item)
         }.disposed(by: disposeBag)
         
