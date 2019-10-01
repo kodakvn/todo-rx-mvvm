@@ -38,6 +38,17 @@ class ViewController: UIViewController {
     var viewModel: TodoViewModel?
     
     let disposeBag = DisposeBag()
+    
+    lazy var searchController: UISearchController = {
+        let controller = UISearchController(searchResultsController: nil)
+        controller.dimsBackgroundDuringPresentation = false
+        controller.searchBar.sizeToFit()
+        controller.searchBar.barStyle = UIBarStyle.black
+        controller.searchBar.barTintColor = UIColor.black
+        controller.searchBar.backgroundColor = UIColor.clear
+        controller.searchBar.placeholder = "Search todos..."
+        return controller
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,9 +62,19 @@ class ViewController: UIViewController {
         
         viewModel = TodoViewModel()
         
-        viewModel?.items.asObservable().bind(to: tableViewItems.rx.items(cellIdentifier: "TodoItemTableViewCell", cellType: TodoItemTableViewCell.self)) { (index, item, cell) in
+        viewModel?.filteredItems.asObservable().bind(to: tableViewItems.rx.items(cellIdentifier: "TodoItemTableViewCell", cellType: TodoItemTableViewCell.self)) { (index, item, cell) in
             cell.configure(viewModel: item)
         }.disposed(by: disposeBag)
+        
+        tableViewItems.tableHeaderView = searchController.searchBar
+        tableViewItems.contentOffset = CGPoint(x: 0, y: searchController.searchBar.frame.height)
+        
+        searchController.searchBar.rx.text
+            .orEmpty
+            .distinctUntilChanged()
+            .debug()
+            .bind(to: (viewModel?.searchValue)!)
+            .disposed(by: disposeBag)
     }
 
     @IBAction func onAddItem(_ sender: UIButton) {

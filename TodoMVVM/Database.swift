@@ -40,7 +40,7 @@ class Database {
     func fetch() -> Results<TodoItem>{
         let realm = try! Realm()
         
-        let results = realm.objects(TodoItem.self)
+        let results = realm.objects(TodoItem.self).sorted(byKeyPath: "createdAt")
         return results
     }
     

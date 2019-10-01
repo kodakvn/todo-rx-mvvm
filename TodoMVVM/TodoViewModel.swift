@@ -131,19 +131,55 @@ protocol TodoViewDelegate: class {
 protocol TodoViewPresentable {
     
     var newTodoItem: String? { get }
+    var searchValue: Variable<String> { get }
     
 }
 
 class TodoViewModel: TodoViewPresentable {
     
     var newTodoItem: String?
+    var searchValue: Variable<String> = Variable("")
     var items: Variable<[TodoItemPresentable]> = Variable([])
+    var filteredItems: Variable<[TodoItemPresentable]> = Variable([])
     var database: Database
     var notificationToken: NotificationToken? = nil
+    let disposeBag = DisposeBag()
+    
+    lazy var searchValueObservable: Observable<String> = self.searchValue.asObservable()
+    lazy var itemsObservable: Observable<[TodoItemPresentable]> = self.items.asObservable()
+    lazy var filteredItemsObservable: Observable<[TodoItemPresentable]> = self.filteredItems.asObservable()
     
     init() {
         database = Database.singleton
-
+        fetchTodos()
+        handleRealmNotifications()
+        
+        searchValueObservable.subscribe(onNext: { value in
+            self.itemsObservable.map({ items in
+                items.filter({ text in
+                    if value.isEmpty { return true }
+                    return text.textValue?.lowercased().contains(value.lowercased()) ?? true
+                })
+                
+            }).bind(to: self.filteredItems).disposed(by: self.disposeBag)
+        }).disposed(by: disposeBag)
+    }
+    
+    deinit {
+        notificationToken?.invalidate()
+    }
+    
+    private func sort() {
+        items.value.sort(by: {
+            if ($0.isDone)! ^^ ($1.isDone)! {
+                return !($0.isDone)! && $1.isDone!
+            } else {
+                return $0.id! < $1.id!
+            }
+        })
+    }
+    
+    private func fetchTodos() {
         ApiService.sharedInstance.fetchAllTodos { (data) in
             let todoDict = try? JSON(data: data)
             
@@ -157,8 +193,9 @@ class TodoViewModel: TodoViewPresentable {
                 })
             }
         }
-        
-        
+    }
+    
+    private func handleRealmNotifications() {
         let results = database.fetch()
         notificationToken = results.observe({ [weak self] (changes: RealmCollectionChange) in
             guard let _self_ = self else { return }
@@ -200,20 +237,6 @@ class TodoViewModel: TodoViewPresentable {
             }
             
             _self_.sort()
-        })
-    }
-    
-    deinit {
-        notificationToken?.invalidate()
-    }
-    
-    private func sort() {
-        items.value.sort(by: {
-            if ($0.isDone)! ^^ ($1.isDone)! {
-                return !($0.isDone)! && $1.isDone!
-            } else {
-                return $0.id! < $1.id!
-            }
         })
     }
 }
