@@ -143,6 +143,7 @@ class TodoViewModel: TodoViewPresentable {
     var database: Database
     var notificationToken: NotificationToken? = nil
     var filteredItemsObservable: Observable<[TodoItemPresentable]>
+    let disposeBag = DisposeBag()
     
     init() {
         database = Database.singleton
@@ -171,19 +172,18 @@ class TodoViewModel: TodoViewPresentable {
     }
     
     private func fetchTodos() {
-        ApiService.sharedInstance.fetchAllTodos { (data) in
-            let todoDict = try? JSON(data: data)
-            
-            if let todosArray = todoDict?["todos"].array {
+        ApiService.sharedInstance.fetchAllTodos().subscribe(onNext: { json in
+            if let todosArray = json["todos"].array {
                 todosArray.forEach({ todoItemDict in
                     if let itemDict = todoItemDict.dictionary {
-                        if let id = itemDict["id"]?.int, let value = itemDict["value"]?.string {
+                        if let _ = itemDict["id"]?.int, let value = itemDict["value"]?.string {
                             self.database.createOrUpdate(todoItemValue: value)
                         }
                     }
                 })
             }
-        }
+
+        }).disposed(by: disposeBag)
     }
     
     private func handleRealmNotifications() {
